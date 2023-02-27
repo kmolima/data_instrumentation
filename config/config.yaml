@@ -1,0 +1,9 @@
+# Broker client configuration file
+host: "10.0.0.21" #ClusterURL
+port: 1883
+clientId: "DataService"
+authentication:
+  token:
+
+topics:
+  - subscribeTopic: "smartocean/pd1/austevoll-nord"
