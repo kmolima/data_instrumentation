@@ -23,13 +23,13 @@ public class AustevollSubscriber {
 	//Metric Category: Accuracy
 	public static final Counter qcCounter = Counter.build().namespace("no_smartocean")
 			.name("data_ingestion_quality_controlled_count").help("Total quality controlled ingested data.")
-			.labelNames("service","qcFlag","retained").register(); //TODO Add label: instance of the service
+			.labelNames("service","qcFlag","retained","provider").register(); //TODO Add label: instance of the service
 
 	//Metric Category: Timeliness
 	public static final Histogram rtDelayHistogram = Histogram.build().namespace("no_smartocean")
 			.name("data_ingestion_arrival_delay")
 			.help("Delay in seconds between data acquisition and arrival to the platform.")
-			.labelNames("service").register();  //TODO Add label: instance of the service
+			.labelNames("service","provider").register();  //TODO Add label: instance of the service
 
 	//Metric Category: System Delay/overhead
 	// OPEN-Telemetry - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/faas-metrics.md

@@ -40,6 +40,7 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
                 pushDelay(doc,Instant.now()); //TODO more accurate arrival time needed?
 
                 //TODO Forward data to next hop on the pipeline if no other restrictive data quality issues were found
+                this.qcCheck();
 
                 System.out.println(
                         "Received message: " + mqttPublish.getTopic() + " -> " + xml.toString());
@@ -87,7 +88,7 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
 
               // Metric
               //this.rtDelayHistogram.observeWithExemplar(exemplar,"DataService");
-              AustevollSubscriber.rtDelayHistogram.labels("DataService").observe(exemplar);
+              AustevollSubscriber.rtDelayHistogram.labels("DataService","AADI").observe(exemplar);
           }
 
         }
@@ -95,6 +96,8 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
 
     protected void qcCheck(){
         //TODO
+        //"service","qcFlag","retained","provider"
+        AustevollSubscriber.qcCounter.labels("DataService","no_qc","false","AADI").inc();
 
     }
 
