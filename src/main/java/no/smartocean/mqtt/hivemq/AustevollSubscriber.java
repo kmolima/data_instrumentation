@@ -18,17 +18,29 @@ public class AustevollSubscriber {
 	//Metric Category: Completeness and Integrity
 	public static final Counter integrityCounter = Counter.build().namespace("no_smartocean")
 			.name("data_ingestion_integrity_faults_count").help("Total integrity faults found in incoming data.")
-			.labelNames("service","cause","retained").register(); //TODO Add label: instance of the service
+			.labelNames("service","cause").register(); //TODO Add label: instance of the service
 
 	//Metric Category: Accuracy
 	public static final Counter qcCounter = Counter.build().namespace("no_smartocean")
 			.name("data_ingestion_quality_controlled_count").help("Total quality controlled ingested data.")
-			.labelNames("service","qcFlag","retained","provider").register(); //TODO Add label: instance of the service
+			.labelNames("service","qcFlag","provider").register(); //TODO Add label: instance of the service
 
 	//Metric Category: Timeliness
 	public static final Histogram rtDelayHistogram = Histogram.build().namespace("no_smartocean")
 			.name("data_ingestion_arrival_delay")
 			.help("Delay in seconds between data acquisition and arrival to the platform.")
+			.labelNames("service","provider").register();  //TODO Add label: instance of the service
+
+	//Metric Category: Volume? Concordance?
+	public static final Histogram validatedHistogram = Histogram.build().namespace("no_smartocean")
+			.name("data_ingestion_validated_bytes")
+			.help("Amount of bytes of messages validated by the platform.")
+			.labelNames("service","provider").register();  //TODO Add label: instance of the service
+
+	//Metric Category: Volume? Concordance?
+	public static final Histogram retainedHistogram = Histogram.build().namespace("no_smartocean")
+			.name("data_ingestion_retained_bytes")
+			.help("Amount of bytes of messages retained by the platform.")
 			.labelNames("service","provider").register();  //TODO Add label: instance of the service
 
 	//Metric Category: System Delay/overhead
@@ -52,34 +64,34 @@ public class AustevollSubscriber {
 				// create an MQTT client
 				final HiveBrokerClient hiveclient = new HiveBrokerClient(conf);
 
-                // Initialize Metrics Collector endpoint for Prometheus
+                // Initialize Metrics Collector endpoint for Prometheus //TODO authenticate with Prometheus
 				HTTPServer server;
 				server = new HTTPServer.Builder()
-							.withPort(9091)
+							.withPort(9091) //TODO make it configurable in yaml file
 							.build();
 
-				hiveclient.getBrokerClient().toAsync().connect().thenAccept(ack -> AustevollSubscriber.logBrokerConnection(ack));
-
-				hiveclient.getBrokerClient()
+				hiveclient.getBrokerClient().toAsync().connect().thenAccept(ack ->
+						hiveclient.getBrokerClient()
 						.toAsync()
 						.subscribeWith()
 						.topicFilter(conf.getTopics().get(0).getSubscribeTopic()) //TODO
-						.qos(MqttQos.AT_LEAST_ONCE)
-						.send();
+						.qos(conf.getTopics().get(0).getConfiguredQos())
+						.callback(new AADIXMLCallback(hiveclient,ack)::accept)
+						.executor(Executors.newSingleThreadExecutor())
+						.send());
 
-				//while(true) {
+				//Messages can be consumed globally set a callback that is called when a message is received (using the async API style)
+				/*hiveclient.getBrokerClient().toAsync().publishes(ALL, new AADIXMLCallback(hiveclient,connAck)::accept,
+						Executors.newSingleThreadExecutor()); //validates each new message in a new thread*/
 
-					//set a callback that is called when a message is received (using the async API style)
-					hiveclient.getBrokerClient().toAsync().publishes(ALL, new AADIXMLCallback()::accept,
-							Executors.newSingleThreadExecutor()); //validates each new message in a new thread
-				//}
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	public static void logBrokerConnection(Mqtt5ConnAck connAck){
-		System.out.println("Connected to Broker "+connAck); //TODO observability - Log
+		System.out.println("Connected to Broker "+connAck); //TODO observability - Log/Event
 	}
 
 }

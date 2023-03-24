@@ -6,6 +6,7 @@ import com.hivemq.client.mqtt.datatypes.MqttQos;
 public class Topic {
 
     private String subscribeTopic;
+    private String publishTopic;
     private int qos;
 
     /* Changes qos in yaml config into MqttQos Enum
@@ -28,5 +29,13 @@ public class Topic {
 
     protected void setSubscribeTopic(String subscribe_topic) {
         this.subscribeTopic = subscribe_topic;
+    }
+
+    public String getPublishTopic() {
+        return publishTopic;
+    }
+
+    protected void setPublishTopic(String publishTopic) {
+        this.publishTopic = publishTopic;
     }
 }

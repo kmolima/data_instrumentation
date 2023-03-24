@@ -1,9 +1,13 @@
 # Broker client configuration file
-host: "10.0.0.21" #ClusterURL
+# ClusterURL
+host: "10.0.0.21"
+# 10.0.0.21 158.37.82.209 158.37.83.87
 port: 1883
-clientId: "DataService"
+clientId: "Data Validation"
 authentication:
   token:
-
+# Data service data flow
 topics:
-  - subscribeTopic: "smartocean/pd1/austevoll-nord"
+  - subscribeTopic: "smartocean/pd1/austevoll-nord/raw"
+    publishTopic: "smartocean/pd1/austevoll-nord/validated"
+    qos: 2 # 0 - AT_MOST_ONCE  | 1 - AT_LEAST_ONCE | 2 - EXACTLY_ONCE
