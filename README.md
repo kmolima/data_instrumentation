@@ -1,12 +1,26 @@
 # Marine Data Instrumentation
 Instrumentation of data metrics 
 
+## Execution
+
+```bash
+docker build -t data_instrumentation .
+docker run -p 9091:9091 data_instrumentation:latest
+```
+
+To customize configuration parameters pass the absolut path of the YAML configuration file (*$PATH_TO_YAML*) as argument in the docker command:
+
+```bash
+docker run -p 9091:9091 -v $PATH_TO_YAML:/etc/config.yaml data_instrumentation:latest
+```
 
 ## Metrics
 
-*Namespace* - 
+*Namespace* - WIP
 
-*Lables* - 
+*Lables* - WIP
+
+*Categories* - Data Metrics, Service Metrics (FaaS), System Metrics
 
 ### Conventions
 Tries to follow conventions from OpenTelemetry and OpenMetrics Initiatives:
