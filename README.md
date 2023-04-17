@@ -1,7 +1,7 @@
 # Marine Data Instrumentation
 Instrumentation of data metrics using [Prometheus JVM client library](https://github.com/prometheus/client_java).
 
-## Execution
+## Docker Build and Execution
 
 ```bash
 docker build -t data_instrumentation .
