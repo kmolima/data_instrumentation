@@ -1,5 +1,5 @@
 # Marine Data Instrumentation
-Instrumentation of data metrics 
+Instrumentation of data metrics using [Prometheus JVM client library](https://github.com/prometheus/client_java).
 
 ## Execution
 
