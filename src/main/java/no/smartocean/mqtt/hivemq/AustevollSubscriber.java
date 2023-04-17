@@ -3,6 +3,7 @@ package no.smartocean.mqtt.hivemq;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck;
 import io.prometheus.client.Counter;
+import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.exporter.HTTPServer;
 
@@ -27,29 +28,55 @@ public class AustevollSubscriber {
 
 	//Metric Category: Timeliness
 	public static final Histogram rtDelayHistogram = Histogram.build().namespace("no_smartocean")
-			.name("data_ingestion_arrival_delay")
-			.help("Delay in seconds between data acquisition and arrival to the platform.")
-			.labelNames("service","provider").register();  //TODO Add label: instance of the service
+			.name("data_ingestion_arrival")
+			.help("Delay in seconds between data acquisition and arrival to the platform.").register();
+			//.labelNames("service","provider").register();  //TODO Add label: instance of the service
 
 	//Metric Category: Volume? Concordance?
 	public static final Histogram validatedHistogram = Histogram.build().namespace("no_smartocean")
-			.name("data_ingestion_validated_bytes")
-			.help("Amount of bytes of messages validated by the platform.")
-			.labelNames("service","provider").register();  //TODO Add label: instance of the service
+			.name("data_ingestion_validated")
+			.help("Amount of bytes of messages validated by the platform.").register();
+			//.labelNames("service","provider").register();  //TODO Add label: instance of the service
 
 	//Metric Category: Volume? Concordance?
 	public static final Histogram retainedHistogram = Histogram.build().namespace("no_smartocean")
-			.name("data_ingestion_retained_bytes")
-			.help("Amount of bytes of messages retained by the platform.")
-			.labelNames("service","provider").register();  //TODO Add label: instance of the service
+			.name("data_ingestion_retained")
+			.help("Amount of bytes of messages retained by the platform.").register();
+			//.labelNames("service","provider").register();  //TODO Add label: instance of the service
 
 	//Metric Category: System Delay/overhead
 	// OPEN-Telemetry - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/faas-metrics.md
 	public static final Histogram serviceDelayHistogram = Histogram.build().namespace("no_smartocean")
-			.name("faas_invoke_duration")
-			.help("Delay in seconds between data acquisition and arrival to the platform.")
+			.name("faas_invoke_duration_histogram")
+			.help("Delay in seconds introduced by this service.").register();
 			// "invoked_name" label replaced by "service"
-			.labelNames("service","trigger").register();  //TODO Add labels: invoked provider & invoked region
+			//.labelNames("service","trigger").register();  //TODO Add labels: invoked provider & invoked region
+
+	//Metric Category: Timeliness
+	public static final Gauge rtDelayGauge = Gauge.build().namespace("no_smartocean")
+			.name("data_ingestion_arrival_delay")
+			.help("Delay in seconds between data acquisition and arrival to the platform.").labelNames("provider").register();
+			//.labelNames("service","provider").register();  //TODO Add label: instance of the service
+
+	//Metric Category: Volume? Concordance?
+	public static final Gauge validatedGauge = Gauge.build().namespace("no_smartocean")
+			.name("data_ingestion_validated_bytes")
+			.help("Amount of bytes of messages validated by the platform.").register();
+			//.labelNames("service","provider").register();  //TODO Add label: instance of the service
+
+	//Metric Category: Volume? Concordance?
+	public static final Gauge retainedGauge = Gauge.build().namespace("no_smartocean")
+			.name("data_ingestion_retained_bytes")
+			.help("Amount of bytes of messages retained by the platform.").register();
+			//.labelNames("service","provider").register();  //TODO Add label: instance of the service
+
+	//Metric Category: System Delay/overhead
+	// OPEN-Telemetry - https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/faas-metrics.md
+	public static final Gauge serviceDelayGauge = Gauge.build().namespace("no_smartocean")
+			.name("faas_invoke_duration")
+			.help("Delay in seconds introduced by this service.").register();
+			// "invoked_name" label replaced by "service"
+			//.labelNames("service","trigger").register();  //TODO Add labels: invoked provider & invoked region
 
 	public static void main(String[] args) {
 

@@ -50,7 +50,8 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
 
     @Override
     public void accept(Mqtt5Publish mqttPublish) {
-        Histogram.Timer timer = AustevollSubscriber.serviceDelayHistogram.labels("DataService","pubsub").startTimer();
+        //Histogram.Timer timer = AustevollSubscriber.serviceDelayHistogram.labels("DataService","pubsub").startTimer();
+        Histogram.Timer timer = AustevollSubscriber.serviceDelayHistogram.startTimer();
         mqttPublish.getPayload().ifPresent(data -> {
             boolean qc_check = true, integrity_check  = true;
             double bytes = data.limit();
@@ -105,9 +106,12 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
                 }
                 else{
                     //retained messages from next hop on the pipeline - unusable data instances
-                    AustevollSubscriber.retainedHistogram.labels("DataService","AADI").observe(bytes); //TODO label cause
+                    //AustevollSubscriber.retainedHistogram.labels("DataService","AADI").observe(bytes); //TODO label cause
+                    AustevollSubscriber.retainedHistogram.observe(bytes); //TODO label cause
                     //observability - push metrics of the Uservice overhead
                     double v = timer.observeDuration();
+                    //AustevollSubscriber.serviceDelayGauge.labels("DataService","AADI").set(v);
+                    AustevollSubscriber.serviceDelayGauge.set(v);
                     System.out.println("Data Validation took "+v+" seconds");
 
                 }
@@ -119,15 +123,23 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
 
         if(onNext){
             System.out.println("Published validated data file with "+ bytes+ " bytes.");
-            AustevollSubscriber.validatedHistogram.labels("DataService","AADI").observe(bytes);
+            //AustevollSubscriber.validatedHistogram.labels("DataService","AADI").observe(bytes);
+            //AustevollSubscriber.validatedGauge.labels("DataService","AADI").set(bytes);
+            AustevollSubscriber.validatedHistogram.observe(bytes);
+            AustevollSubscriber.validatedGauge.set(bytes);
         }
         else{
             System.err.println("Error publishing validated data file. "); //TODO retry?
-            AustevollSubscriber.retainedHistogram.labels("DataService","AADI").observe(bytes); //TODO label cause
+            //AustevollSubscriber.retainedHistogram.labels("DataService","AADI").observe(bytes); //TODO label cause
+            AustevollSubscriber.retainedHistogram.observe(bytes); //TODO label cause
+            //AustevollSubscriber.retainedGauge.labels("DataService","AADI").set(bytes);
+            AustevollSubscriber.retainedGauge.set(bytes);
         }
 
         //observability - push metrics of the Uservice overhead
         double v = timer.observeDuration();
+        //AustevollSubscriber.serviceDelayGauge.labels("DataService","AADI").set(v);
+        AustevollSubscriber.serviceDelayGauge.set(v);
         System.out.println("Data Validation took "+v+" seconds");
 
     }
@@ -156,7 +168,10 @@ public class AADIXMLCallback implements Consumer<Mqtt5Publish> {
 
               // Metric
               //this.rtDelayHistogram.observeWithExemplar(exemplar,"DataService");
-              AustevollSubscriber.rtDelayHistogram.labels("DataService","AADI").observe(exemplar);
+              //AustevollSubscriber.rtDelayHistogram.labels("DataService","AADI").observe(exemplar);
+              //AustevollSubscriber.rtDelayGauge.labels("DataService","AADI").set(exemplar);
+              AustevollSubscriber.rtDelayHistogram.observe(exemplar);
+              AustevollSubscriber.rtDelayGauge.labels("AADI").set(exemplar);
           }
 
         }
