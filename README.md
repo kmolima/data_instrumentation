@@ -11,7 +11,7 @@ docker run -p 9091:9091 data_instrumentation:latest
 To customize configuration parameters pass the absolut path of the YAML configuration file (*$PATH_TO_YAML*) as argument in the docker command:
 
 ```bash
-docker run -p 9091:9091 -v $PATH_TO_YAML:/etc/config.yaml data_instrumentation:latest
+docker run -p 9091:9091 -v $PATH_TO_YAML:/etc/data_instrumentation/config.yaml data_instrumentation:latest
 ```
 
 ## Metrics
