@@ -15,15 +15,15 @@ RUN mvn -f /home/app/pom.xml clean package # use wrapper as alternative
 #
 FROM openjdk:11-jre-slim
 COPY --from=build /home/app/target/data_instrumentation-1.0-SNAPSHOT-jar-with-dependencies.jar /usr/local/lib/app.jar
-COPY config/config.yaml /etc/config.yaml
+COPY config/config.yaml /etc/data_instrumentation/config.yaml
 
 # Use non-root user and group
 RUN addgroup appgroup
 RUN adduser --disabled-password appuser --ingroup appgroup --no-create-home
-RUN chown -R appuser:appgroup /etc/config.yaml /usr/local/lib/app.jar
+RUN chown -R appuser:appgroup /etc/data_instrumentation/config.yaml /usr/local/lib/app.jar
 USER appuser
 
 # Target port for Prometheus to scrape metrics
 EXPOSE 9091
 ENTRYPOINT ["java","-jar","/usr/local/lib/app.jar"]
-CMD ["/etc/config.yaml"]
+CMD ["/etc/data_instrumentation/config.yaml"]
